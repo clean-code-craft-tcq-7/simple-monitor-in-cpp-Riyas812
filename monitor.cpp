@@ -1,5 +1,4 @@
 #include "./monitor.h"
-#include <assert.h>
 #include <thread>
 #include <chrono>
 #include <iostream>
@@ -15,18 +14,34 @@ void alertBlink(const char* message) {
     }
 }
 
+struct VitalCheck {
+    bool (*check)(float, float, float);
+    const char* message;
+};
+
+bool tempOutOfRange(float temperature, float, float) {
+    return temperature > 102 || temperature < 95;
+}
+bool pulseOutOfRange(float, float pulseRate, float) {
+    return pulseRate < 60 || pulseRate > 100;
+}
+bool spo2OutOfRange(float, float, float spo2) {
+    return spo2 < 90;
+}
+
 int vitalsOk(float temperature, float pulseRate, float spo2) {
-    if (temperature > 102 || temperature < 95) {
-        alertBlink("Temperature is critical!");
-        return 0;
+    VitalCheck checks[] = {
+        { tempOutOfRange, "Temperature is critical!" },
+        { pulseOutOfRange, "Pulse Rate is out of range!" },
+        { spo2OutOfRange, "Oxygen Saturation out of range!" }
+    };
+
+    for (const auto& check : checks) {
+        if (check.check(temperature, pulseRate, spo2)) {
+            alertBlink(check.message);
+            return 0;
+        }
     }
-    if (pulseRate < 60 || pulseRate > 100) {
-        alertBlink("Pulse Rate is out of range!");
-        return 0;
-    }
-    if (spo2 < 90) {
-        alertBlink("Oxygen Saturation out of range!");
-        return 0;
-    }
+
     return 1;
 }
