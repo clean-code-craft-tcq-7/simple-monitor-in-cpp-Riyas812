@@ -2,6 +2,7 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <algorithm>
 using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
 void alertBlink(const char* message) {
