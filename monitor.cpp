@@ -30,17 +30,18 @@ bool spo2OutOfRange(float, float, float spo2) {
 }
 
 int vitalsOk(float temperature, float pulseRate, float spo2) {
-    VitalCheck checks[] = {
+   static const VitalCheck checks[] = {
         { tempOutOfRange, "Temperature is critical!" },
         { pulseOutOfRange, "Pulse Rate is out of range!" },
         { spo2OutOfRange, "Oxygen Saturation out of range!" }
     };
 
-    for (const auto& check : checks) {
-        if (check.check(temperature, pulseRate, spo2)) {
-            alertBlink(check.message);
-            return 0;
-        }
+    auto it = std::find_if(std::begin(checks), std::end(checks),
+        [&](const VitalCheck& check) { return check.check(temperature, pulseRate, spo2); });
+
+    if (it != std::end(checks)) {
+        alertBlink(it->message);
+        return 0;
     }
 
     return 1;
