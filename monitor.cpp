@@ -34,7 +34,7 @@ static const VitalCheck checks[] = {
         { tempOutOfRange, "Temperature is critical!" },
         { pulseOutOfRange, "Pulse Rate is out of range!" },
         { spo2OutOfRange, "Oxygen Saturation out of range!" }
-   };
+};
 
     auto it = std::find_if(std::begin(checks), std::end(checks),
         [&](const VitalCheck& check) { return check.check(temperature, pulseRate, spo2); });
